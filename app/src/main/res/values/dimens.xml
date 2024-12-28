@@ -4,4 +4,10 @@
     <dimen name="margin_S">16dp</dimen>
     <dimen name="margin_XXS">8dp</dimen>
     <dimen name="titleLoginSize">56sp</dimen>
+    <dimen name="padding_XXS">8dp</dimen>
+    <dimen name="titleNote_size">14sp</dimen>
+    <dimen name="DescriptionNote_size">12sp</dimen>
+    <dimen name="titleMainSize">25sp</dimen>
+    <dimen name="pinnedIconSize">25dp</dimen>
+    <dimen name="lineHeight">0.5dp</dimen>
 </resources>

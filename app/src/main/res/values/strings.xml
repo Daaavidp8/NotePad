@@ -9,4 +9,6 @@
     <string name="register_text">Registrarse</string>
     <string name="users">Usuarios</string>
     <string name="title">NotePad</string>
+    <string name="TitleMain">Notes</string>
+    <string name="description_note_add">Añadir Nota</string>
 </resources>

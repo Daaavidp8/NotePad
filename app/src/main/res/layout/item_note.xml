@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:elevation="@dimen/margin_S"
+    app:cardCornerRadius="@dimen/margin_XXS"
+    android:background="@color/white"
+    app:strokeWidth="0dp">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/padding_XXS"
+        >
+
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/imagePinned"
+            android:layout_width="@dimen/pinnedIconSize"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:button="@drawable/states_cb_pinned"
+            android:buttonTint="@android:color/white"
+            app:buttonTint="@color/gray"
+            android:checked="true"
+            />
+
+        <TextView
+            tools:text="Titulo de la cosa a realizar"
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/titleNote_size"
+            android:maxLines="1"
+            app:layout_constraintStart_toEndOf="@id/imagePinned"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:fontFamily="@font/sfbold"
+            android:textStyle="bold"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/containerDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintStart_toEndOf="@id/imagePinned"
+            app:layout_constraintEnd_toEndOf="parent"
+            >
+
+            <TextView
+                tools:text="05/07/04"
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/DescriptionNote_size"
+                android:maxLines="1"
+                android:textColor="@color/textGray"
+                android:paddingEnd="@dimen/padding_XXS"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:fontFamily="@font/sfprotext"
+                />
+
+            <TextView
+                tools:text="Descripcion de la cosa a realizar"
+                android:id="@+id/tvDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/DescriptionNote_size"
+                android:maxLines="1"
+                android:textColor="@color/textGray"
+                app:layout_constraintStart_toEndOf="@id/tvDate"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:fontFamily="@font/sfprotext"
+
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/lineHeight"
+            android:background="#000000"
+            app:layout_constraintTop_toBottomOf="@id/containerDescription"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imagePinned"
+            android:layout_marginTop="@dimen/margin_XXS"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -15,14 +15,14 @@ import org.json.JSONObject
 
 class LoginActivity : AppCompatActivity() {
 
-    lateinit var lbinding: ActivityLoginBinding
+    private lateinit var lbinding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         lbinding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(lbinding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(lbinding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
