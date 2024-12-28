@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padding_S">16dp</dimen>
+    <dimen name="margin_S">16dp</dimen>
+    <dimen name="margin_XXS">8dp</dimen>
+    <dimen name="titleLoginSize">56sp</dimen>
+</resources>

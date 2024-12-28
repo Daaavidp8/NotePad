@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">NotePad</string>
     <string name="imagen_de_fondo">Imagen de fondo</string>
+    <string name="sp_last_user">sp_lastUsername</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="remember">Recuerdame</string>
+    <string name="login_text">Iniciar Sesión</string>
+    <string name="register_text">Registrarse</string>
+    <string name="users">Usuarios</string>
+    <string name="title">NotePad</string>
 </resources>

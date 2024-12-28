@@ -14,4 +14,134 @@
         android:contentDescription="@string/imagen_de_fondo"
         />
 
+    <TextView
+        android:id="@+id/titleLogin"
+        android:text="@string/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/handwritten"
+        android:textSize="@dimen/titleLoginSize"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@id/containerForm"
+        app:layout_constraintStart_toStartOf="@id/containerForm"
+        app:layout_constraintEnd_toEndOf="@id/containerForm" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/containerForm"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_S"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="@dimen/margin_S"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clLoginInputs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="@dimen/margin_S"
+            >
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:hint="@string/username"
+                app:hintTextColor="@color/woodDarkOrange"
+                app:boxStrokeColor="@color/woodDarkOrange"
+                android:textColorHint="@color/gray"
+                app:passwordToggleTint="@color/gray"
+                app:boxBackgroundColor="@color/white"
+                >
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tietUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="text"
+                    />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/tilUsername"
+                app:layout_constraintStart_toStartOf="parent"
+                android:hint="@string/password"
+                app:hintTextColor="@color/woodDarkOrange"
+                app:boxStrokeColor="@color/woodDarkOrange"
+                android:textColorHint="@color/gray"
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTint="@color/gray"
+                app:boxBackgroundColor="@color/white"
+                >
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tietPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/rememberCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/remember"
+            app:layout_constraintTop_toBottomOf="@id/clLoginInputs"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginVertical="@dimen/margin_XXS"
+            app:buttonTint="@color/woodDarkOrange"
+            />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/rememberCheckbox"
+            >
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/login_text"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/woodDarkOrange"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_register"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/register_text"
+                app:layout_constraintTop_toBottomOf="@id/btn_login"
+                app:layout_constraintStart_toStartOf="parent"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/woodLightOrange"
+                />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
