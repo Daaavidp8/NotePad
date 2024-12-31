@@ -11,4 +11,8 @@
     <string name="title">NotePad</string>
     <string name="TitleMain">Notes</string>
     <string name="description_note_add">Añadir Nota</string>
+    <string name="NoteTitle">Título de la nota</string>
+    <string name="NoteContent">Contenido de la nota</string>
+    <string name="textButtonBack">Back</string>
+    <string name="textButtonOk">OK</string>
 </resources>

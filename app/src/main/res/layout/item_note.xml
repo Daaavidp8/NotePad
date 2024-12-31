@@ -27,7 +27,6 @@
             android:button="@drawable/states_cb_pinned"
             android:buttonTint="@android:color/white"
             app:buttonTint="@color/gray"
-            android:checked="true"
             />
 
         <TextView
