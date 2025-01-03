@@ -10,4 +10,6 @@
     <dimen name="titleMainSize">25sp</dimen>
     <dimen name="pinnedIconSize">25dp</dimen>
     <dimen name="lineHeight">0.5dp</dimen>
+    <dimen name="contentNoteSize">16sp</dimen>
+    <dimen name="TitleNoteSize">24sp</dimen>
 </resources>

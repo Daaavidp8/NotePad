@@ -1,4 +1,6 @@
 [versions]
+room = "2.6.1"
+ksp = "1.9.0-1.0.13"
 agp = "8.6.1"
 glideVersion = "4.16.0"
 kotlin = "1.9.0"
@@ -13,6 +15,8 @@ constraintlayout = "2.2.0"
 glide = "5.0.0-rc01"
 
 [libraries]
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 glide-v4160 = { module = "com.github.bumptech.glide:glide", version.ref = "glideVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -25,6 +29,7 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 
 [plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 

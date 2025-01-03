@@ -37,6 +37,7 @@
             />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAddNote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_post_add"
@@ -46,6 +47,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:backgroundTint="@color/white"
             app:tint="@color/woodLightOrange"
+            app:rippleColor="@color/woodLightOrange"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
