@@ -44,6 +44,8 @@ class ActionsActivity : AppCompatActivity() {
             insets
         }
 
+        loadUserId()
+
         abinding.buttonBack.setOnClickListener {
             finish()
         }
