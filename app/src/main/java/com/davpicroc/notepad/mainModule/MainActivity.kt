@@ -1,5 +1,6 @@
 package com.davpicroc.notepad.mainModule
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
 import android.os.Bundle
@@ -18,12 +19,17 @@ import com.davpicroc.notepad.databinding.ActivityMainBinding
 import com.davpicroc.notepad.entity.NoteEntity
 import com.davpicroc.notepad.mainModule.adapter.NoteAdapter
 import com.davpicroc.notepad.mainModule.adapter.OnClickListener
+import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity(),OnClickListener {
 
     private lateinit var noteAdapter: NoteAdapter
     private lateinit var mLinearLayout: LinearLayoutManager
     private lateinit var mbinding: ActivityMainBinding
+
+    private val preferences by lazy { getSharedPreferences("MyPreferences", Context.MODE_PRIVATE) }
+    private val lastUserIdKey by lazy { getString(R.string.sp_last_user) }
+    private var userId by Delegates.notNull<Long>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,11 +41,18 @@ class MainActivity : AppCompatActivity(),OnClickListener {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        loadUserId()
+
+
         setupRecyclerView()
 
         mbinding.fabAddNote.setOnClickListener {
             startActivity(Intent(this, ActionsActivity::class.java))
         }
+    }
+
+    private fun loadUserId() {
+       userId = preferences.getLong(lastUserIdKey, 0)
     }
 
     private fun setupRecyclerView() {
@@ -58,7 +71,7 @@ class MainActivity : AppCompatActivity(),OnClickListener {
     private fun getNotes() {
         Thread {
             val notes =
-                NoteApplication.database.noteDao().getAllNotes()
+                NoteApplication.database.noteDao().getAllNotesFromUser(userId)
             runOnUiThread {
                 noteAdapter.setNotes(notes)
             }

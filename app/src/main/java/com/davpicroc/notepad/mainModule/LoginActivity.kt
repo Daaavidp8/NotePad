@@ -8,98 +8,163 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
+import com.davpicroc.notepad.NoteApplication
 import com.davpicroc.notepad.R
 import com.davpicroc.notepad.databinding.ActivityLoginBinding
+import com.davpicroc.notepad.entity.UserEntity
+import com.davpicroc.notepad.utils.HashUtils
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var lbinding: ActivityLoginBinding
 
+    private val preferences by lazy { getSharedPreferences("MyPreferences", Context.MODE_PRIVATE) }
+    private val lastUserIdKey by lazy { getString(R.string.sp_last_user) }
+    private val usersJsonKey by lazy { getString(R.string.users) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         lbinding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(lbinding.root)
+
         ViewCompat.setOnApplyWindowInsetsListener(lbinding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        val preferences = getPreferences(Context.MODE_PRIVATE)
-        val lastUser = preferences.getString(getString(R.string.sp_last_user),
-            null)
-
         val usernameEditText = lbinding.tietUsername
         val passwordEditText = lbinding.tietPassword
 
-
-        if (lastUser != null){
-            lbinding.rememberCheckbox.isChecked = true
-            val credentials = lastUser.removeSurrounding("{", "}").split("=")
-            passwordEditText.setText(credentials[0])
-            usernameEditText.setText(credentials[1])
-        }
+        loadLastUser()
 
         Glide.with(this)
             .load("https://i.pinimg.com/736x/a1/29/03/a12903f9b0eee457230cf692bec3a964.jpg")
             .centerCrop()
             .into(lbinding.imgBackground)
 
-        val users = mutableMapOf<String, String>()
-
-        val sharedPreferences = preferences.getString(getString(R.string.users), "{}")
-        val savedUsers = JSONObject(sharedPreferences ?: "{}")
-        savedUsers.keys().forEach {
-            users[it] = savedUsers.getString(it)
-        }
-
         lbinding.btnLogin.setOnClickListener {
-
             val usernameInput = usernameEditText.text.toString()
             val passwordInput = passwordEditText.text.toString()
 
-            if (users[usernameInput] == passwordInput) {
-                if (lbinding.rememberCheckbox.isChecked){
-                    preferences.edit().putString(getString(R.string.sp_last_user), mapOf(usernameInput to passwordInput).toString()).apply()
-                }else{
-                    preferences.edit().putString(getString(R.string.sp_last_user), null).apply()
-                }
-                startActivity(Intent(this, MainActivity::class.java))
+            if (validateLogin(usernameInput, passwordInput)) {
+                saveLastUserId(usernameInput)
+                navigateToMainActivity()
             } else {
-                Snackbar.make(
-                    findViewById(android.R.id.content),
-                    "Credenciales inválidas.",
-                    Snackbar.LENGTH_LONG
-                ).show()
+                showSnackbar("Credenciales inválidas.")
             }
         }
 
         lbinding.btnRegister.setOnClickListener {
-            val usernameInput = lbinding.tietUsername.text.toString()
-            val passwordInput = lbinding.tietPassword.text.toString()
-            var message: String
+            val usernameInput = usernameEditText.text.toString()
+            val passwordInput = passwordEditText.text.toString()
 
-            if (usernameInput.isNotEmpty() && passwordInput.isNotEmpty()) {
-                if (!users.containsKey(usernameInput)) {
-                    users[usernameInput] = passwordInput
-
-                    with(preferences.edit()) {
-                        val usersJson = JSONObject(users as Map<*, *>).toString()
-                        putString(getString(R.string.users), usersJson).apply()
-                    }
-
-                    message = "Usuario registrado correctamente!"
-                } else {
-                    message = "Este usuario ya está registrado."
-                }
-            } else {
-                message = "Las credenciales no pueden estar vacías."
-            }
-
-            Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show()
+            val message = handleRegistration(usernameInput, passwordInput)
+            showSnackbar(message)
         }
+    }
+
+    private fun validateLogin(username: String, password: String): Boolean {
+        val user = runBlocking {
+            val user = async { getUserByUsername(username) }
+            user.await()
+        }
+        return if (user != null) {
+            val hashedPassword = HashUtils.hashPassword(password)
+            user.password == hashedPassword
+        } else {
+            false
+        }
+    }
+
+    private suspend fun getUserByUsername(username: String): UserEntity? {
+        return try {
+            withContext(Dispatchers.IO) {
+                NoteApplication.database.userDao().getUserByName(username)
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun handleRegistration(username: String, password: String): String {
+        return when {
+            username.isEmpty() || password.isEmpty() -> "Las credenciales no pueden estar vacías."
+            isUserRegistered(username) -> "Este usuario ya está registrado."
+            else -> {
+                registerUser(username, password)
+                "Usuario registrado correctamente!"
+            }
+        }
+    }
+
+    private fun isUserRegistered(username: String): Boolean {
+        val user = runBlocking {
+            val user = async { getUserByUsername(username) }
+            user.await()
+        }
+        val resultado = user != null
+        return resultado
+    }
+
+    private fun registerUser(username: String, password: String) {
+        val hashedPassword = HashUtils.hashPassword(password)
+        val newUser = UserEntity(username = username, password = hashedPassword)
+
+
+        Thread{
+            NoteApplication.database.userDao().addUser(newUser)
+        }.start()
+
+        val usersJson = JSONObject(mapOf(username to hashedPassword)).toString()
+        preferences.edit().putString(usersJsonKey, usersJson).apply()
+    }
+
+    private fun saveLastUserId(username: String) {
+        val user = runBlocking {
+            val user = async { getUserByUsername(username) }
+            user.await()
+        }
+        val lastUserId = user?.id ?: 0
+        preferences.edit().putLong(lastUserIdKey, lastUserId).apply()
+    }
+
+    private fun loadLastUser() {
+        val lastUserId = preferences.getLong(lastUserIdKey, 0)
+        if (lastUserId != 0L) {
+            lbinding.rememberCheckbox.isChecked = true
+            val lastUser = runBlocking {
+                val user = async { getUserById(lastUserId) }
+                user.await()
+            }
+            lbinding.tietUsername.setText(lastUser?.username)
+
+        }
+    }
+
+    private suspend fun getUserById(id: Long): UserEntity? {
+        return try {
+            withContext(Dispatchers.IO) {
+                NoteApplication.database.userDao().getUserById(id)
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun navigateToMainActivity() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
+    }
+
+    private fun showSnackbar(message: String) {
+        Snackbar.make(lbinding.root, message, Snackbar.LENGTH_LONG).show()
     }
 }

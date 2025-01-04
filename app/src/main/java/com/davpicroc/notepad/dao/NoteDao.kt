@@ -9,8 +9,8 @@ import com.davpicroc.notepad.entity.NoteEntity
 
 @Dao
 interface NoteDao {
-    @Query("SELECT * FROM NoteEntity ORDER BY isPinned DESC, id ASC")
-    fun getAllNotes(): MutableList<NoteEntity>
+    @Query("SELECT * FROM NoteEntity WHERE userId == :id ORDER BY isPinned DESC, id ASC")
+    fun getAllNotesFromUser(id: Long): MutableList<NoteEntity>
     @Query("SELECT * FROM NoteEntity WHERE id = :id")
     fun getNote(id: Long): NoteEntity
     @Insert

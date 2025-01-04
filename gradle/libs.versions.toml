@@ -1,7 +1,9 @@
 [versions]
+bcrypt = "0.9.0"
+kotlinxCoroutinesAndroid = "1.7.3"
 room = "2.6.1"
 ksp = "1.9.0-1.0.13"
-agp = "8.6.1"
+agp = "8.7.3"
 glideVersion = "4.16.0"
 kotlin = "1.9.0"
 coreKtx = "1.15.0"
@@ -13,20 +15,24 @@ material = "1.12.0"
 activity = "1.9.3"
 constraintlayout = "2.2.0"
 glide = "5.0.0-rc01"
+roomCommon = "2.6.1"
 
 [libraries]
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+bcrypt = { module = "at.favre.lib:bcrypt", version.ref = "bcrypt" }
 glide-v4160 = { module = "com.github.bumptech.glide:glide", version.ref = "glideVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
 
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}

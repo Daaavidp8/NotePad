@@ -11,5 +11,6 @@ data class NoteEntity @RequiresApi(Build.VERSION_CODES.O) constructor(
     var Title: String,
     var Content: String = "",
     var Date: String,
-    var isPinned: Boolean = false
+    var isPinned: Boolean = false,
+    var userId: Long
 )

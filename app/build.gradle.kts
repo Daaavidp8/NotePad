@@ -40,7 +40,10 @@ android {
 }
 
 dependencies {
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.bcrypt)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.common)
     ksp(libs.androidx.room.compiler)
     implementation(libs.glide.v4160)
     implementation(libs.androidx.core.ktx)
