@@ -13,4 +13,24 @@ data class NoteEntity @RequiresApi(Build.VERSION_CODES.O) constructor(
     var Date: String,
     var isPinned: Boolean = false,
     var userId: Long
-)
+){
+    companion object{
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun fromString(string: String): NoteEntity? {
+            val regex = """id=(\d+), Title=([A-Za-z0-9\s]+), Content=([A-Za-z0-9\s]+), Date=([0-9/]+), isPinned=(true|false), userId=(\d+)""".toRegex()
+
+            val matchResult = regex.find(string)
+            return matchResult?.let {
+                val (id, title, content, date, isPinned, userId) = it.destructured
+                NoteEntity(
+                    id = id.toLong(),
+                    Title = title,
+                    Content = content,
+                    Date = date,
+                    isPinned = isPinned.toBoolean(),
+                    userId = userId.toLong()
+                )
+            }
+        }
+    }
+}

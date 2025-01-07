@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -128,7 +129,8 @@ class MainActivity : AppCompatActivity(),OnClickListener {
 
 
     override fun onClick(note: NoteEntity,position: Int) {
-        TODO("Not yet implemented")
+        Log.i("Log_SobreNotas",note.toString())
+        startActivity(Intent(this, ActionsActivity::class.java).putExtra("Note",note.toString()))
     }
 
     override fun onLongClick(note: NoteEntity) {

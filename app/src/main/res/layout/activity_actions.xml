@@ -36,6 +36,7 @@
         android:textColor="@color/woodLightOrange"
         android:textAlignment="textEnd"
         android:textStyle="bold"
+
         />
 
     <EditText
@@ -44,6 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_S"
         android:layout_marginEnd="@dimen/margin_S"
+        android:autofillHints=""
         android:hint="@string/NoteTitle"
         android:textSize="@dimen/TitleNoteSize"
         android:textStyle="bold"
@@ -52,7 +54,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:fontFamily="@font/sfbold"
-        app:layout_constraintTop_toBottomOf="@id/buttonBack" />
+        app:layout_constraintTop_toBottomOf="@id/buttonBack"
+        />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="0dp"
@@ -64,12 +67,15 @@
         android:layout_marginBottom="@dimen/margin_XXS"
         app:helperTextTextColor="@color/woodLightOrange"
         app:boxStrokeColor="@color/woodLightOrange"
+        app:hintTextColor="@color/woodLightOrange"
         >
         <EditText
             android:id="@+id/contentNote"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:autofillHints=""
             android:hint="@string/NoteContent"
+            android:textColorHint="@color/woodLightOrange"
             android:textSize="@dimen/contentNoteSize"
             android:scrollbars="vertical"
             android:gravity="top"
