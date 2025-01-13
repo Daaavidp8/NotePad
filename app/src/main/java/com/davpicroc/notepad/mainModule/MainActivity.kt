@@ -12,10 +12,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.davpicroc.notepad.NoteApplication
 import com.davpicroc.notepad.R
-import com.davpicroc.notepad.databinding.ActivityLoginBinding
 import com.davpicroc.notepad.databinding.ActivityMainBinding
 import com.davpicroc.notepad.entity.NoteEntity
 import com.davpicroc.notepad.mainModule.adapter.NoteAdapter
@@ -48,8 +46,19 @@ class MainActivity : AppCompatActivity(),OnClickListener {
         setupRecyclerView()
 
         mbinding.fabAddNote.setOnClickListener {
-            startActivity(Intent(this, ActionsActivity::class.java))
+            launchEditFragment()
         }
+    }
+
+    private fun launchEditFragment() {
+        val fragment = EditNoteFragment()
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction =
+            fragmentManager.beginTransaction()
+        fragmentTransaction.add(R.id.containerMain, fragment)
+        fragmentTransaction.commit()
+        mbinding.fabAddNote.hide()
+        fragmentTransaction.addToBackStack(null)
     }
 
     private fun loadUserId() {
