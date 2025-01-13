@@ -61,7 +61,7 @@ class NoteAdapter(private var notes: MutableList<NoteEntity>,
     override fun onBindViewHolder(holder: NoteAdapter.ViewHolder, position: Int) {
         val note = notes[position]
         with(holder) {
-            setListener(note,position)
+            setListener(note)
             binding.tvTitle.text = note.Title
             binding.tvDate.text = note.Date
             binding.tvDescription.text = note.Content
@@ -74,9 +74,9 @@ class NoteAdapter(private var notes: MutableList<NoteEntity>,
     inner class ViewHolder(view: View):
         RecyclerView.ViewHolder(view) {
         val binding = ItemNoteBinding.bind(view)
-        fun setListener(note: NoteEntity,position: Int) {
+        fun setListener(note: NoteEntity) {
             binding.root.setOnClickListener{
-                listener.onClick(note,position)
+                listener.onClick(note)
             }
             binding.root.setOnLongClickListener{
                 listener.onLongClick(note)

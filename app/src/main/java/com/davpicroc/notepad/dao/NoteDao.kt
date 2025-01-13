@@ -14,7 +14,7 @@ interface NoteDao {
     @Query("SELECT * FROM NoteEntity WHERE id = :id")
     fun getNote(id: Long): NoteEntity
     @Insert
-    fun addNote(noteEntity: NoteEntity)
+    fun addNote(noteEntity: NoteEntity) : Long
     @Update
     fun updateNote(noteEntity: NoteEntity)
     @Delete

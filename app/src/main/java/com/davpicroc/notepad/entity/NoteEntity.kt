@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "NoteEntity")
 data class NoteEntity @RequiresApi(Build.VERSION_CODES.O) constructor(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey(autoGenerate = true) var id: Long = 0,
     var Title: String,
     var Content: String = "",
     var Date: String,

@@ -17,17 +17,14 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.MenuProvider
-import androidx.core.widget.addTextChangedListener
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.davpicroc.notepad.databinding.FragmentEditNoteBinding
 import com.davpicroc.notepad.mainModule.MainActivity
 import com.davpicroc.notepad.R
 import com.davpicroc.notepad.NoteApplication
 import com.davpicroc.notepad.entity.NoteEntity
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputLayout
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.properties.Delegates
 
 class EditNoteFragment : Fragment() {
@@ -38,11 +35,25 @@ class EditNoteFragment : Fragment() {
     private var isEditMode: Boolean = false
     private var mNoteEntity: NoteEntity? = null
 
+    private val preferences by lazy {
+        requireContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
+    }
+
+    private val lastUserIdKey by lazy {
+        getString(R.string.sp_last_user)
+    }
+
+    private var userIdpref: Long by Delegates.notNull()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        userIdpref = preferences.getLong(lastUserIdKey, -1L)
+        if (userIdpref == -1L) {
+            throw IllegalStateException("User ID no encontrado")
+        }
         binding = FragmentEditNoteBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -52,15 +63,17 @@ class EditNoteFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val activity = activity as? MainActivity
         mActivity = activity
-        setupActionBar()
-        createMenu()
         val id = arguments?.getLong(getString(R.string.arg_id), 0)
         if (id != null && id != 0L) {
             isEditMode = true
             getNote(id)
         } else {
             isEditMode = false
-            mNoteEntity = NoteEntity(Title = "", Content = "", Date = "", isPinned = false, userId = "")
+            mNoteEntity = NoteEntity(Title = "", Content = "", Date = "", isPinned = false, userId = 0)
+        }
+
+        binding.buttonBack.setOnClickListener{
+
         }
         setupTextFields()
     }
@@ -83,93 +96,13 @@ class EditNoteFragment : Fragment() {
         }
     }
 
-    private fun createMenu() {
-        menuProvider = object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    android.R.id.home -> {
-                        mActivity?.onBackPressedDispatcher?.onBackPressed()
-                        true
-                    }
-
-                    R.id.action_save -> {
-                        if (mNoteEntity != null &&
-                            validateFields(binding., binding.contentNote)) {
-                            with(mNoteEntity!!) {
-                                name = binding.etName.text.toString().trim()
-                                phone = binding.etPhone.text.toString().trim()
-                                website = binding.etWebsite.text.toString().trim()
-                                photoUrl = binding.etPhotoUrl.text.toString().trim()
-                            }
-
-                            Thread {
-                                if (isEditMode) {
-                                    NoteApplication.database.NoteDao().updateNote(mNoteEntity!!)
-                                } else {
-                                    mNoteEntity!!.id =
-                                        NoteApplication.database.NoteDao().addNote(mNoteEntity!!)
-                                }
-                                requireActivity().runOnUiThread {
-                                    hideKeyboard()
-                                    if (isEditMode) {
-                                        mActivity?.updateNote(mNoteEntity!!)
-                                        Snackbar.make(
-                                            binding.root,
-                                            R.string.edit_Note_message_update_success,
-                                            Snackbar.LENGTH_SHORT
-                                        ).show()
-                                        mActivity?.onBackPressedDispatcher?.onBackPressed()
-                                    } else {
-                                        mActivity?.addNote(mNoteEntity!!)
-                                        Toast.makeText(
-                                            mActivity,
-                                            R.string.edit_Note_message_save_success,
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        mActivity?.onBackPressedDispatcher?.onBackPressed()
-                                    }
-                                }
-                            }.start()
-                        }
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-        }
-        menuProvider?.let {
-            requireActivity().addMenuProvider(it)
-        }
-    }
-
-    private fun setupActionBar() {
-        mActivity = activity as? MainActivity
-        mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        if (isEditMode) {
-            mActivity?.supportActionBar?.title =
-                getString(R.string.edit_Note_title_edit)
-        } else {
-            mActivity?.supportActionBar?.title =
-                getString(R.string.edit_Note_title_add)
-        }
-    }
-
     private fun setupTextFields() {
         with(binding) {
-            etName.addTextWatcher {
-                validateFields(tilName)
+            editTextTitle.addTextWatcher {
+                validateFields(editTextTitle)
             }
-            etPhone.addTextWatcher {
-                validateFields(tilPhone)
-            }
-            etPhotoUrl.addTextWatcher {
-                validateFields(tilPhotoUrl)
-                loadImage(it.toString().trim())
+            contentNote.addTextWatcher {
+                validateFields(contentNote)
             }
         }
     }
@@ -185,22 +118,15 @@ class EditNoteFragment : Fragment() {
             Int, before: Int, count: Int) { /* TODO */ }
         })
     }
-    private fun loadImage(url: String) {
-        Glide.with(this)
-            .load(url)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .centerCrop()
-            .into(binding.imgPhoto)
-    }
 
     private fun validateFields(vararg textFields:
-                               TextInputLayout
+                               EditText
     ): Boolean {
         var isValid = true
         for (textField in textFields) {
-            if (textField.editText?.text.toString().trim().isEmpty()) {
+            if (textField.text.toString().trim().isEmpty()) {
                 textField.error = getString(R.string.helper_required)
-                textField.editText?.requestFocus()
+                textField.requestFocus()
                 isValid = false
             } else {
                 textField.error = null

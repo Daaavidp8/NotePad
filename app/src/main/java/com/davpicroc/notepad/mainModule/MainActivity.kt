@@ -1,10 +1,8 @@
 package com.davpicroc.notepad.mainModule
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Canvas
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.davpicroc.Notes.mainModule.EditNoteFragment
 import com.davpicroc.notepad.NoteApplication
 import com.davpicroc.notepad.R
 import com.davpicroc.notepad.databinding.ActivityMainBinding
@@ -20,7 +19,7 @@ import com.davpicroc.notepad.mainModule.adapter.NoteAdapter
 import com.davpicroc.notepad.mainModule.adapter.OnClickListener
 import kotlin.properties.Delegates
 
-class MainActivity : AppCompatActivity(),OnClickListener {
+class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
 
     private lateinit var noteAdapter: NoteAdapter
     private lateinit var mLinearLayout: LinearLayoutManager
@@ -50,16 +49,18 @@ class MainActivity : AppCompatActivity(),OnClickListener {
         }
     }
 
-    private fun launchEditFragment() {
+    private fun launchEditFragment(args: Bundle? = null) {
         val fragment = EditNoteFragment()
+        if (args != null) fragment.arguments = args
         val fragmentManager = supportFragmentManager
         val fragmentTransaction =
             fragmentManager.beginTransaction()
-        fragmentTransaction.add(R.id.containerMain, fragment)
-        fragmentTransaction.commit()
-        mbinding.fabAddNote.hide()
+        fragmentTransaction.add(R.id.main, fragment)
         fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.commit()
+        hideFab()
     }
+
 
     private fun loadUserId() {
        userId = preferences.getLong(lastUserIdKey, 0)
@@ -86,6 +87,18 @@ class MainActivity : AppCompatActivity(),OnClickListener {
                 noteAdapter.setNotes(notes)
             }
         }.start()
+    }
+
+    override fun hideFab(isVisible: Boolean) {
+        if (isVisible) mbinding.fabAddNote.show() else mbinding.fabAddNote.hide()
+    }
+
+    override fun addNote(noteEntity: NoteEntity) {
+        noteAdapter.add(noteEntity)
+    }
+
+    override fun updateNote(noteEntity: NoteEntity) {
+        noteAdapter.update(noteEntity)
     }
 
     private fun setupSwipe() {
@@ -137,9 +150,10 @@ class MainActivity : AppCompatActivity(),OnClickListener {
 
 
 
-    override fun onClick(note: NoteEntity,position: Int) {
-        Log.i("Log_SobreNotas",note.toString())
-        startActivity(Intent(this, ActionsActivity::class.java).putExtra("Note",note.toString()))
+    override fun onClick(note: NoteEntity) {
+        val args = Bundle()
+        args.putLong(getString(R.string.arg_id), note.id)
+        launchEditFragment(args)
     }
 
     override fun onLongClick(note: NoteEntity) {
