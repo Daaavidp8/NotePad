@@ -2,8 +2,10 @@ package com.davpicroc.notepad.mainModule
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,6 +21,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import javax.crypto.SecretKey
 
 class LoginActivity : AppCompatActivity() {
 
@@ -28,6 +31,7 @@ class LoginActivity : AppCompatActivity() {
     private val lastUserIdKey by lazy { getString(R.string.sp_last_user) }
     private val usersJsonKey by lazy { getString(R.string.users) }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -39,6 +43,7 @@ class LoginActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
 
         val usernameEditText = lbinding.tietUsername
         val passwordEditText = lbinding.tietPassword
@@ -71,13 +76,14 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun validateLogin(username: String, password: String): Boolean {
         val user = runBlocking {
             val user = async { getUserByUsername(username) }
             user.await()
         }
         return if (user != null) {
-            val hashedPassword = HashUtils.hashPassword(password)
+            val hashedPassword = HashUtils.encrypt(password)
             user.password == hashedPassword
         } else {
             false
@@ -94,6 +100,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleRegistration(username: String, password: String): String {
         return when {
             username.isEmpty() || password.isEmpty() -> "Las credenciales no pueden estar vacías."
@@ -114,8 +121,9 @@ class LoginActivity : AppCompatActivity() {
         return resultado
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun registerUser(username: String, password: String) {
-        val hashedPassword = HashUtils.hashPassword(password)
+        val hashedPassword = HashUtils.encrypt(password)
         val newUser = UserEntity(username = username, password = hashedPassword)
 
 
@@ -136,6 +144,7 @@ class LoginActivity : AppCompatActivity() {
         preferences.edit().putLong(lastUserIdKey, lastUserId).apply()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun loadLastUser() {
         val lastUserId = preferences.getLong(lastUserIdKey, 0)
         if (lastUserId != 0L) {
@@ -145,7 +154,7 @@ class LoginActivity : AppCompatActivity() {
                 user.await()
             }
             lbinding.tietUsername.setText(lastUser?.username)
-
+            lbinding.tietPassword.setText(HashUtils.decrypt(lastUser?.password.toString()))
         }
     }
 

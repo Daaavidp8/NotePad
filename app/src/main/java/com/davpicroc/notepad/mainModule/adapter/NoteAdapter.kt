@@ -45,7 +45,7 @@ class NoteAdapter(private var notes: MutableList<NoteEntity>,
     }
 
     fun update(note: NoteEntity) {
-        val index = notes.indexOf(note)
+        val index = notes.indexOfFirst { it.id == note.id }
         if (index != -1) {
             notes[index] = note
             notifyItemChanged(index)

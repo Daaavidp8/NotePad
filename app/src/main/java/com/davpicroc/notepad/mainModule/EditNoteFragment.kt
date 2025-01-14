@@ -1,5 +1,6 @@
 package com.davpicroc.Notes.mainModule
 
+import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
@@ -73,8 +74,50 @@ class EditNoteFragment : Fragment() {
         }
 
         binding.buttonBack.setOnClickListener{
-
+            mActivity?.onBackPressedDispatcher?.onBackPressed()
         }
+
+        binding.actionSave.setOnClickListener{
+            if (mNoteEntity != null &&
+                validateFields(binding.editTextTitle, binding.contentNote)) {
+                with(mNoteEntity!!) {
+                    Title = binding.editTextTitle.text.toString().trim()
+                    Content = binding.contentNote.text.toString().trim()
+                    Date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    userId = userIdpref
+                }
+
+                Thread {
+                    if (isEditMode) {
+                        NoteApplication.database.noteDao().updateNote(mNoteEntity!!)
+                    } else {
+                        mNoteEntity!!.id =
+                            NoteApplication.database.noteDao().addNote(mNoteEntity!!)
+                    }
+                    requireActivity().runOnUiThread {
+                        hideKeyboard()
+                        if (isEditMode) {
+                            mActivity?.updateNote(mNoteEntity!!)
+                            Snackbar.make(
+                                binding.root,
+                                R.string.edit_Note_message_update_success,
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                            mActivity?.onBackPressedDispatcher?.onBackPressed()
+                        } else {
+                            mActivity?.addNote(mNoteEntity!!)
+                            Toast.makeText(
+                                mActivity,
+                                R.string.edit_Note_message_save_success,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            mActivity?.onBackPressedDispatcher?.onBackPressed()
+                        }
+                    }
+                }.start()
+            }
+        }
+
         setupTextFields()
     }
 

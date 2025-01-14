@@ -1,26 +1,27 @@
 package com.davpicroc.notepad.utils
 
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
+import android.os.Build
+import androidx.annotation.RequiresApi
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
+import javax.crypto.spec.SecretKeySpec
+import java.util.Base64
 
 object HashUtils {
 
-    fun hashPassword(password: String): String {
-        try {
-            val digest = MessageDigest.getInstance("SHA-256")
-            val hashBytes = digest.digest(password.toByteArray())
-            return bytesToHex(hashBytes)
-        } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
-            return ""
-        }
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun encrypt(text: String): String {
+        val cipher = Cipher.getInstance("AES")
+        val encryptedBytes = cipher.doFinal(text.toByteArray())
+        return Base64.getEncoder().encodeToString(encryptedBytes)
     }
 
-    private fun bytesToHex(bytes: ByteArray): String {
-        val sb = StringBuilder()
-        for (b in bytes) {
-            sb.append(String.format("%02x", b))
-        }
-        return sb.toString()
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun decrypt(encryptedText: String): String {
+        val cipher = Cipher.getInstance("AES")
+        val decodedBytes = Base64.getDecoder().decode(encryptedText)
+        val originalBytes = cipher.doFinal(decodedBytes)
+        return String(originalBytes)
     }
 }
