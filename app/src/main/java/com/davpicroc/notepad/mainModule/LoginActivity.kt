@@ -14,7 +14,6 @@ import com.davpicroc.notepad.NoteApplication
 import com.davpicroc.notepad.R
 import com.davpicroc.notepad.databinding.ActivityLoginBinding
 import com.davpicroc.notepad.common.entities.UserEntity
-import com.davpicroc.notepad.utils.HashUtils
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -82,8 +81,7 @@ class LoginActivity : AppCompatActivity() {
             user.await()
         }
         return if (user != null) {
-            val hashedPassword = HashUtils.encrypt(password)
-            user.password == hashedPassword
+            user.password == password
         } else {
             false
         }
@@ -122,15 +120,14 @@ class LoginActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun registerUser(username: String, password: String) {
-        val hashedPassword = HashUtils.encrypt(password)
-        val newUser = UserEntity(username = username, password = hashedPassword)
+        val newUser = UserEntity(username = username, password = password)
 
 
         Thread{
             NoteApplication.database.userDao().addUser(newUser)
         }.start()
 
-        val usersJson = JSONObject(mapOf(username to hashedPassword)).toString()
+        val usersJson = JSONObject(mapOf(username to password)).toString()
         preferences.edit().putString(usersJsonKey, usersJson).apply()
     }
 
@@ -153,7 +150,7 @@ class LoginActivity : AppCompatActivity() {
                 user.await()
             }
             lbinding.tietUsername.setText(lastUser?.username)
-            lbinding.tietPassword.setText(HashUtils.decrypt(lastUser?.password.toString()))
+            lbinding.tietPassword.setText(lastUser?.password.toString())
         }
     }
 

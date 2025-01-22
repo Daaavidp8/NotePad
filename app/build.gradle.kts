@@ -47,8 +47,6 @@ dependencies {
 
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel)
-    implementation(libs.jetbrains.kotlinx.coroutines.android)
-    implementation(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.glide.v4160)
