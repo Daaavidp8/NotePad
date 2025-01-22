@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import com.davpicroc.notepad.common.entities.NoteEntity
 import com.davpicroc.notepad.editNoteModule.model.EditNoteInteractor
 
-class editNoteViewModel: ViewModel() {
-    private var noteSelected: MutableLiveData<NoteEntity>()
+class EditNoteViewModel: ViewModel() {
+    private var noteSelected: MutableLiveData<NoteEntity> = MutableLiveData()
     private var showFab = MutableLiveData<Boolean>()
     private var result = MutableLiveData<Any>()
 
@@ -47,7 +47,6 @@ class editNoteViewModel: ViewModel() {
     fun updateNote(noteEntity: NoteEntity){
         editNoteInteractor.updateNote(noteEntity){ noteUpdated ->
             result.value = noteUpdated
-
         }
     }
 

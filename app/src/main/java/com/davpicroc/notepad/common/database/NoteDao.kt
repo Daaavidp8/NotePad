@@ -16,7 +16,7 @@ interface NoteDao {
     @Insert
     fun addNote(noteEntity: NoteEntity) : Long
     @Update
-    fun updateNote(noteEntity: NoteEntity)
+    suspend fun updateNote(noteEntity: NoteEntity)
     @Delete
     fun deleteNote(noteEntity: NoteEntity)
 }

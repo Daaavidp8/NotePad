@@ -14,11 +14,14 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.MenuProvider
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProvider
 import com.davpicroc.notepad.databinding.FragmentEditNoteBinding
 import com.davpicroc.notepad.mainModule.MainActivity
 import com.davpicroc.notepad.R
 import com.davpicroc.notepad.NoteApplication
 import com.davpicroc.notepad.common.entities.NoteEntity
+import com.davpicroc.notepad.editNoteModule.viewModel.EditNoteViewModel
 import com.google.android.material.snackbar.Snackbar
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -31,6 +34,7 @@ class EditNoteFragment : Fragment() {
     private var mActivity: MainActivity? = null
     private var isEditMode: Boolean = false
     private var mNoteEntity: NoteEntity? = null
+    private lateinit var mEditNoteViewModel: EditNoteViewModel
 
     private val preferences by lazy {
         requireContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
@@ -41,6 +45,12 @@ class EditNoteFragment : Fragment() {
     }
 
     private var userIdpref: Long by Delegates.notNull()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        mEditNoteViewModel = ViewModelProvider(requireActivity())[EditNoteViewModel::class.java]
+    }
 
 
     override fun onCreateView(
@@ -60,14 +70,9 @@ class EditNoteFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val activity = activity as? MainActivity
         mActivity = activity
-        val id = arguments?.getLong(getString(R.string.arg_id), 0)
-        if (id != null && id != 0L) {
-            isEditMode = true
-            getNote(id)
-        } else {
-            isEditMode = false
-            mNoteEntity = NoteEntity(Title = "", Content = "", Date = "", isPinned = false, userId = 0)
-        }
+
+
+        setupViewModel()
 
         binding.buttonBack.setOnClickListener{
             mActivity?.onBackPressedDispatcher?.onBackPressed()
@@ -83,49 +88,55 @@ class EditNoteFragment : Fragment() {
                     userId = userIdpref
                 }
 
-                Thread {
-                    if (isEditMode) {
-                        NoteApplication.database.noteDao().updateNote(mNoteEntity!!)
-                    } else {
-                        mNoteEntity!!.id =
-                            NoteApplication.database.noteDao().addNote(mNoteEntity!!)
-                    }
-                    requireActivity().runOnUiThread {
-                        hideKeyboard()
-                        if (isEditMode) {
-                            mActivity?.updateNote(mNoteEntity!!)
-                            Snackbar.make(
-                                binding.root,
-                                R.string.edit_Note_message_update_success,
-                                Snackbar.LENGTH_SHORT
-                            ).show()
-                            mActivity?.onBackPressedDispatcher?.onBackPressed()
-                        } else {
-                            mActivity?.addNote(mNoteEntity!!)
-                            Toast.makeText(
-                                mActivity,
-                                R.string.edit_Note_message_save_success,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            mActivity?.onBackPressedDispatcher?.onBackPressed()
-                        }
-                    }
-                }.start()
+                if (isEditMode){
+                    mEditNoteViewModel.updateNote(mNoteEntity!!)
+                }else{
+                    mEditNoteViewModel.saveNote(mNoteEntity!!)
+                }
             }
         }
 
         setupTextFields()
     }
 
-    private fun getNote(id: Long) {
-        Thread {
-            mNoteEntity = NoteApplication.database.noteDao().getNote(id)
-            requireActivity().runOnUiThread {
-                if (mNoteEntity != null) {
-                    setUINote(mNoteEntity!!)
+    private fun setupViewModel() {
+        mEditNoteViewModel.getNoteSelected().observe(viewLifecycleOwner){
+            mNoteEntity = it
+            if (it.id != 0L) {
+                isEditMode = true
+                setUINote(mNoteEntity!!)
+            } else {
+                isEditMode = false
+            }
+        }
+
+        mEditNoteViewModel.getResult().observe(viewLifecycleOwner){ result ->
+            hideKeyboard()
+
+            when(result){
+                is Long -> {
+                    mNoteEntity!!.id = result
+                    mEditNoteViewModel.setNoteSelected(mNoteEntity!!)
+
+                    Toast.makeText(
+                        mActivity,
+                        R.string.edit_Note_message_save_success,
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    mActivity?.onBackPressedDispatcher?.onBackPressed()
+                }
+                is NoteEntity -> {
+                    mEditNoteViewModel.setNoteSelected(mNoteEntity!!)
+
+                    Toast.makeText(
+                        mActivity,
+                        R.string.edit_Note_message_update_success,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
-        }.start()
+        }
     }
 
     private fun setUINote(noteEntity: NoteEntity) {

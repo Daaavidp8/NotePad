@@ -2,8 +2,10 @@ package com.davpicroc.notepad.mainModule
 
 import android.content.Context
 import android.graphics.Canvas
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -18,9 +20,13 @@ import com.davpicroc.notepad.R
 import com.davpicroc.notepad.databinding.ActivityMainBinding
 import com.davpicroc.notepad.common.entities.NoteEntity
 import com.davpicroc.notepad.common.utils.MainAux
+import com.davpicroc.notepad.editNoteModule.viewModel.EditNoteViewModel
 import com.davpicroc.notepad.mainModule.adapter.NoteAdapter
 import com.davpicroc.notepad.mainModule.adapter.OnClickListener
 import com.davpicroc.notepad.mainModule.viewModel.MainViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
@@ -30,11 +36,13 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
     private lateinit var mbinding: ActivityMainBinding
 
     private lateinit var mMainViewModel: MainViewModel
+    private lateinit var mEditNoteViewModel: EditNoteViewModel
 
     private val preferences by lazy { getSharedPreferences("MyPreferences", Context.MODE_PRIVATE) }
     private val lastUserIdKey by lazy { getString(R.string.sp_last_user) }
     private var userId by Delegates.notNull<Long>()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -63,6 +71,15 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
         mMainViewModel.getNotes().observe(this){ notes ->
             noteAdapter.setNotes(notes)
         }
+        mEditNoteViewModel = ViewModelProvider(this).get(EditNoteViewModel::class.java)
+
+        mEditNoteViewModel.getShowFab().observe(this){ isVisible ->
+            if (isVisible) mbinding.fabAddNote.show() else mbinding.fabAddNote.hide()
+        }
+
+        mEditNoteViewModel.getNoteSelected().observe(this){ noteEntity ->
+            noteAdapter.add(noteEntity)
+        }
     }
 
     // Preguntar a Antonio: Esto no se ni lo que hace, me lo ha hecho chatgpt
@@ -76,9 +93,13 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
     }
 
 
-    private fun launchEditFragment(args: Bundle? = null) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun launchEditFragment(noteEntity: NoteEntity = NoteEntity()) {
+        mEditNoteViewModel.setShowFab(false)
+        mEditNoteViewModel.setNoteSelected(noteEntity)
+
+
         val fragment = EditNoteFragment()
-        if (args != null) fragment.arguments = args
         val fragmentManager = supportFragmentManager
         val fragmentTransaction =
             fragmentManager.beginTransaction()
@@ -107,13 +128,11 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
     }
 
     private fun getNotes() {
-        Thread {
+        CoroutineScope(Dispatchers.Main).launch {
             val notes =
                 NoteApplication.database.noteDao().getAllNotesFromUser(userId)
-            runOnUiThread {
-                noteAdapter.setNotes(notes)
-            }
-        }.start()
+            noteAdapter.setNotes(notes)
+        }
     }
 
     override fun hideFab(isVisible: Boolean) {
@@ -177,19 +196,13 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onClick(note: NoteEntity) {
-        val args = Bundle()
-        args.putLong(getString(R.string.arg_id), note.id)
-        launchEditFragment(args)
+        launchEditFragment(note)
     }
 
     override fun onLongClick(note: NoteEntity) {
         note.isPinned = !note.isPinned
-        Thread {
-            NoteApplication.database.noteDao().updateNote(note)
-            runOnUiThread {
-                noteAdapter.update(note)
-            }
-        }.start()
+        mEditNoteViewModel.updateNote(note)
     }
 }

@@ -14,6 +14,9 @@ data class NoteEntity @RequiresApi(Build.VERSION_CODES.O) constructor(
     var isPinned: Boolean = false,
     var userId: Long
 ){
+    @RequiresApi(Build.VERSION_CODES.O)
+    constructor() : this(Title = "", Date = "", userId = 0)
+
     companion object{
         @RequiresApi(Build.VERSION_CODES.O)
         fun fromString(string: String): NoteEntity? {

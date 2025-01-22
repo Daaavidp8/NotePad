@@ -48,6 +48,8 @@ dependencies {
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.jetbrains.kotlinx.coroutines.android)
+    implementation(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.glide.v4160)
     implementation(libs.androidx.core.ktx)
@@ -55,7 +57,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.glide)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
