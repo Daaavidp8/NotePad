@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.davpicroc.notepad.R
 import com.davpicroc.notepad.databinding.ItemNoteBinding
-import com.davpicroc.notepad.entity.NoteEntity
+import com.davpicroc.notepad.common.entities.NoteEntity
 import java.io.Serializable
 
 class NoteAdapter(private var notes: MutableList<NoteEntity>,
@@ -53,8 +53,8 @@ class NoteAdapter(private var notes: MutableList<NoteEntity>,
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setNotes(notes: MutableList<NoteEntity>) {
-        this.notes = notes
+    fun setNotes(notes: List<NoteEntity>) {
+        this.notes = notes as MutableList<NoteEntity>
         notifyDataSetChanged()
     }
 

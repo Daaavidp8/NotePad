@@ -7,16 +7,20 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.davpicroc.Notes.mainModule.EditNoteFragment
+import com.davpicroc.notepad.editNoteModule.EditNoteFragment
 import com.davpicroc.notepad.NoteApplication
 import com.davpicroc.notepad.R
 import com.davpicroc.notepad.databinding.ActivityMainBinding
-import com.davpicroc.notepad.entity.NoteEntity
+import com.davpicroc.notepad.common.entities.NoteEntity
+import com.davpicroc.notepad.common.utils.MainAux
 import com.davpicroc.notepad.mainModule.adapter.NoteAdapter
 import com.davpicroc.notepad.mainModule.adapter.OnClickListener
+import com.davpicroc.notepad.mainModule.viewModel.MainViewModel
 import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
@@ -24,6 +28,8 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
     private lateinit var noteAdapter: NoteAdapter
     private lateinit var mLinearLayout: LinearLayoutManager
     private lateinit var mbinding: ActivityMainBinding
+
+    private lateinit var mMainViewModel: MainViewModel
 
     private val preferences by lazy { getSharedPreferences("MyPreferences", Context.MODE_PRIVATE) }
     private val lastUserIdKey by lazy { getString(R.string.sp_last_user) }
@@ -41,13 +47,34 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
         }
         loadUserId()
 
-
+        setupViewModel()
         setupRecyclerView()
 
         mbinding.fabAddNote.setOnClickListener {
             launchEditFragment()
         }
     }
+
+    // Pregunta a Antonio: se puede pasar al constructor del viewmodel el id de usuario para extraer
+    // las notas de un usuario en especifico?
+
+    private fun setupViewModel() {
+        mMainViewModel = ViewModelProvider(this,MainViewModelFactory(userId))[MainViewModel::class.java]
+        mMainViewModel.getNotes().observe(this){ notes ->
+            noteAdapter.setNotes(notes)
+        }
+    }
+
+    // Preguntar a Antonio: Esto no se ni lo que hace, me lo ha hecho chatgpt
+    class MainViewModelFactory(private val userId: Long) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+                return MainViewModel(userId) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
+
 
     private fun launchEditFragment(args: Bundle? = null) {
         val fragment = EditNoteFragment()

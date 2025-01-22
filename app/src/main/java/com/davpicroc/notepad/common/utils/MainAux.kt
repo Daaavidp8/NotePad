@@ -1,6 +1,6 @@
-package com.davpicroc.notepad.mainModule
+package com.davpicroc.notepad.common.utils
 
-import com.davpicroc.notepad.entity.NoteEntity
+import com.davpicroc.notepad.common.entities.NoteEntity
 
 interface MainAux {
     fun hideFab(isVisible: Boolean = false)

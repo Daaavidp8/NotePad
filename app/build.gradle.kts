@@ -44,6 +44,10 @@ dependencies {
     implementation(libs.bcrypt)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.common)
+
+    // ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.jetbrains.kotlinx.coroutines.android)
     ksp(libs.androidx.room.compiler)
     implementation(libs.glide.v4160)
     implementation(libs.androidx.core.ktx)

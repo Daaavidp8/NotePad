@@ -1,9 +1,9 @@
-package com.davpicroc.notepad.dao
+package com.davpicroc.notepad.common.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.davpicroc.notepad.entity.NoteEntity
-import com.davpicroc.notepad.entity.UserEntity
+import com.davpicroc.notepad.common.entities.NoteEntity
+import com.davpicroc.notepad.common.entities.UserEntity
 
 @Database(entities = [NoteEntity::class, UserEntity::class], version = 2, exportSchema = false)
 abstract class NoteDatabase : RoomDatabase() {

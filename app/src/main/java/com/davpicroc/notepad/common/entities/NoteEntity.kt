@@ -1,4 +1,4 @@
-package com.davpicroc.notepad.entity
+package com.davpicroc.notepad.common.entities
 
 import android.os.Build
 import androidx.annotation.RequiresApi

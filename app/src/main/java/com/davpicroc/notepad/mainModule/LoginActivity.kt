@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide
 import com.davpicroc.notepad.NoteApplication
 import com.davpicroc.notepad.R
 import com.davpicroc.notepad.databinding.ActivityLoginBinding
-import com.davpicroc.notepad.entity.UserEntity
+import com.davpicroc.notepad.common.entities.UserEntity
 import com.davpicroc.notepad.utils.HashUtils
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +21,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import javax.crypto.SecretKey
 
 class LoginActivity : AppCompatActivity() {
 

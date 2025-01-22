@@ -1,11 +1,11 @@
-package com.davpicroc.notepad.dao
+package com.davpicroc.notepad.common.database
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.davpicroc.notepad.entity.UserEntity
+import com.davpicroc.notepad.common.entities.UserEntity
 
 @Dao
 interface UserDao {

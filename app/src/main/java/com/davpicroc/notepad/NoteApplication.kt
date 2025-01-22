@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.davpicroc.notepad.dao.NoteDatabase
+import com.davpicroc.notepad.common.database.NoteDatabase
 
 class NoteApplication : Application() {
     companion object {
