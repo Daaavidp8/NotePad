@@ -10,13 +10,13 @@ import com.davpicroc.notepad.common.entities.UserEntity
 @Dao
 interface UserDao {
     @Query("SELECT * FROM UserEntity")
-    fun getAllUsers(): MutableList<UserEntity>
+    suspend fun getAllUsers(): MutableList<UserEntity>
     @Query("SELECT * FROM UserEntity WHERE username = :username")
-    fun getUserByName(username: String): UserEntity
+    suspend fun getUserByName(username: String): UserEntity
     @Query("SELECT * FROM UserEntity WHERE id = :id")
-    fun getUserById(id: Long): UserEntity
+    suspend fun getUserById(id: Long): UserEntity
     @Insert
-    fun addUser(userEntity: UserEntity)
+    suspend fun addUser(userEntity: UserEntity): Long
     @Update
     fun updateUser(userEntity: UserEntity)
     @Delete

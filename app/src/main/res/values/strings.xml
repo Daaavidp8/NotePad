@@ -24,4 +24,5 @@
     <string name="edit_Note_title_add">Añadir Nota</string>
     <string name="edit_Note_message_update_success">Nota actualizada correctamente</string>
     <string name="edit_Note_message_save_success">Nota Creada Correctamente</string>
+    <string name="backButton">back</string>
 </resources>

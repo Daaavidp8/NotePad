@@ -7,6 +7,9 @@ import android.text.Editable
 import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
@@ -14,12 +17,11 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.MenuProvider
-import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import com.davpicroc.notepad.databinding.FragmentEditNoteBinding
 import com.davpicroc.notepad.mainModule.MainActivity
 import com.davpicroc.notepad.R
-import com.davpicroc.notepad.NoteApplication
 import com.davpicroc.notepad.common.entities.NoteEntity
 import com.davpicroc.notepad.editNoteModule.viewModel.EditNoteViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -35,6 +37,7 @@ class EditNoteFragment : Fragment() {
     private var isEditMode: Boolean = false
     private var mNoteEntity: NoteEntity? = null
     private lateinit var mEditNoteViewModel: EditNoteViewModel
+
 
     private val preferences by lazy {
         requireContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
@@ -72,8 +75,14 @@ class EditNoteFragment : Fragment() {
         mActivity = activity
 
 
+        setClicksListener()
         setupViewModel()
 
+        setupTextFields()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setClicksListener() {
         binding.buttonBack.setOnClickListener{
             mActivity?.onBackPressedDispatcher?.onBackPressed()
         }
@@ -95,8 +104,6 @@ class EditNoteFragment : Fragment() {
                 }
             }
         }
-
-        setupTextFields()
     }
 
     private fun setupViewModel() {

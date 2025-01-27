@@ -9,27 +9,33 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.davpicroc.notepad.NoteApplication
 import com.davpicroc.notepad.R
 import com.davpicroc.notepad.databinding.ActivityLoginBinding
 import com.davpicroc.notepad.common.entities.UserEntity
+import com.davpicroc.notepad.editNoteModule.viewModel.EditNoteViewModel
+import com.davpicroc.notepad.editNoteModule.viewModel.EditUserViewModel
+import com.davpicroc.notepad.mainModule.MainActivity.MainViewModelFactory
+import com.davpicroc.notepad.mainModule.viewModel.LoginViewModel
+import com.davpicroc.notepad.mainModule.viewModel.MainViewModel
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var lbinding: ActivityLoginBinding
+    private lateinit var mEditUserViewModel: EditUserViewModel
+    private lateinit var mLoginViewModel: LoginViewModel
 
     private val preferences by lazy { getSharedPreferences("MyPreferences", Context.MODE_PRIVATE) }
     private val lastUserIdKey by lazy { getString(R.string.sp_last_user) }
     private val usersJsonKey by lazy { getString(R.string.users) }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -42,6 +48,8 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
+
+        mLoginViewModel = ViewModelProvider(this)[LoginViewModel::class.java]
 
         val usernameEditText = lbinding.tietUsername
         val passwordEditText = lbinding.tietPassword
@@ -57,11 +65,13 @@ class LoginActivity : AppCompatActivity() {
             val usernameInput = usernameEditText.text.toString()
             val passwordInput = passwordEditText.text.toString()
 
-            if (validateLogin(usernameInput, passwordInput)) {
-                saveLastUserId(usernameInput)
-                navigateToMainActivity()
-            } else {
-                showSnackbar("Credenciales inválidas.")
+            runBlocking {
+                if (validateLogin(usernameInput, passwordInput)) {
+                    saveLastUserId(usernameInput)
+                    navigateToMainActivity()
+                } else {
+                    showSnackbar("Credenciales inválidas.")
+                }
             }
         }
 
@@ -69,36 +79,28 @@ class LoginActivity : AppCompatActivity() {
             val usernameInput = usernameEditText.text.toString()
             val passwordInput = passwordEditText.text.toString()
 
-            val message = handleRegistration(usernameInput, passwordInput)
-            showSnackbar(message)
+            runBlocking {
+                val message = handleRegistration(usernameInput, passwordInput)
+                showSnackbar(message)
+            }
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun validateLogin(username: String, password: String): Boolean {
-        val user = runBlocking {
-            val user = async { getUserByUsername(username) }
-            user.await()
-        }
-        return if (user != null) {
-            user.password == password
-        } else {
-            false
-        }
+
+    private suspend fun validateLogin(username: String, password: String): Boolean {
+        val user = getUserByUsername(username)
+        return user != null && user.password == password
     }
 
     private suspend fun getUserByUsername(username: String): UserEntity? {
         return try {
-            withContext(Dispatchers.IO) {
-                NoteApplication.database.userDao().getUserByName(username)
-            }
+            mLoginViewModel.getUserByName(username)
         } catch (e: Exception) {
             null
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun handleRegistration(username: String, password: String): String {
+    private suspend fun handleRegistration(username: String, password: String): String {
         return when {
             username.isEmpty() || password.isEmpty() -> "Las credenciales no pueden estar vacías."
             isUserRegistered(username) -> "Este usuario ya está registrado."
@@ -109,56 +111,45 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun isUserRegistered(username: String): Boolean {
-        val user = runBlocking {
-            val user = async { getUserByUsername(username) }
-            user.await()
-        }
-        val resultado = user != null
-        return resultado
+    private suspend fun isUserRegistered(username: String): Boolean {
+        val user = getUserByUsername(username)
+        return user != null
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun registerUser(username: String, password: String) {
         val newUser = UserEntity(username = username, password = password)
-
-
-        Thread{
-            NoteApplication.database.userDao().addUser(newUser)
-        }.start()
+        mEditUserViewModel.saveUser(newUser)
 
         val usersJson = JSONObject(mapOf(username to password)).toString()
         preferences.edit().putString(usersJsonKey, usersJson).apply()
     }
 
-    private fun saveLastUserId(username: String) {
-        val user = runBlocking {
-            val user = async { getUserByUsername(username) }
-            user.await()
-        }
+    private suspend fun saveLastUserId(username: String) {
+        val user = getUserByUsername(username)
         val lastUserId = user?.id ?: 0
         preferences.edit().putLong(lastUserIdKey, lastUserId).apply()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun loadLastUser() {
         val lastUserId = preferences.getLong(lastUserIdKey, 0)
         if (lastUserId != 0L) {
             lbinding.rememberCheckbox.isChecked = true
-            val lastUser = runBlocking {
-                val user = async { getUserById(lastUserId) }
-                user.await()
+            lifecycleScope.launch {
+                val lastUser = getUserById(lastUserId)
+
+                if (lastUser != null) {
+                    lbinding.tietUsername.setText(lastUser.username)
+                    lbinding.tietPassword.setText(lastUser.password)
+                } else {
+                    showSnackbar("Usuario no encontrado.")
+                }
             }
-            lbinding.tietUsername.setText(lastUser?.username)
-            lbinding.tietPassword.setText(lastUser?.password.toString())
         }
     }
 
     private suspend fun getUserById(id: Long): UserEntity? {
         return try {
-            withContext(Dispatchers.IO) {
-                NoteApplication.database.userDao().getUserById(id)
-            }
+            mLoginViewModel.getUserById(id)
         } catch (e: Exception) {
             null
         }

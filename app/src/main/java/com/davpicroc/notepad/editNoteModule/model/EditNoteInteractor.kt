@@ -2,6 +2,7 @@ package com.davpicroc.notepad.editNoteModule.model
 
 import com.davpicroc.notepad.NoteApplication
 import com.davpicroc.notepad.common.entities.NoteEntity
+import com.davpicroc.notepad.common.entities.UserEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
     private val lastUserIdKey by lazy { getString(R.string.sp_last_user) }
     private var userId by Delegates.notNull<Long>()
 
+    private var isFragmentTransactionInProgress = false
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +80,9 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
         }
 
         mEditNoteViewModel.getNoteSelected().observe(this){ noteEntity ->
-            noteAdapter.add(noteEntity)
+            if (noteEntity.id != 0L) {
+                noteAdapter.add(noteEntity)
+            }
         }
     }
 
@@ -101,11 +105,13 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
 
         val fragment = EditNoteFragment()
         val fragmentManager = supportFragmentManager
-        val fragmentTransaction =
-            fragmentManager.beginTransaction()
-        fragmentTransaction.add(R.id.main, fragment)
-        fragmentTransaction.addToBackStack(null)
-        fragmentTransaction.commit()
+
+        if (!fragmentManager.isStateSaved) {
+            val fragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.add(R.id.containerMain, fragment)
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commitAllowingStateLoss()
+        }
         hideFab()
     }
 
