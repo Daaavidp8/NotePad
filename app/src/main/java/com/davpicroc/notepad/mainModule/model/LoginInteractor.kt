@@ -24,12 +24,9 @@ class LoginInteractor {
         }
     }
 
-    fun getUserByName(name: String,callback: (UserEntity) -> Unit){
-        CoroutineScope(Dispatchers.IO).launch{
-            val user = NoteApplication.database.userDao().getUserByName(name)
-            withContext(Dispatchers.Main){
-                callback(user)
-            }
+    suspend fun getUserByName(name: String): UserEntity?{
+        return withContext(Dispatchers.IO) {
+            NoteApplication.database.userDao().getUserByName(name)
         }
     }
 }

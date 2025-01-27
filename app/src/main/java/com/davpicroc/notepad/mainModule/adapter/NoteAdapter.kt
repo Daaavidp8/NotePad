@@ -58,6 +58,12 @@ class NoteAdapter(private var notes: MutableList<NoteEntity>,
         notifyDataSetChanged()
     }
 
+
+    fun getNotes(): List<NoteEntity> {
+       return notes
+    }
+
+
     override fun onBindViewHolder(holder: NoteAdapter.ViewHolder, position: Int) {
         val note = notes[position]
         with(holder) {

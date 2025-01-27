@@ -20,9 +20,9 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    suspend fun getUserByName(name: String): UserEntity {
-        return withContext(Dispatchers.IO) {
-            NoteApplication.database.userDao().getUserByName(name)
+    fun getUserByName(name: String): UserEntity? {
+        return runBlocking {
+            mainInteractor.getUserByName(name)
         }
     }
 

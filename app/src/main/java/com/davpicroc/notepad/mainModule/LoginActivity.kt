@@ -1,9 +1,12 @@
 package com.davpicroc.notepad.mainModule
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -50,6 +53,7 @@ class LoginActivity : AppCompatActivity() {
 
 
         mLoginViewModel = ViewModelProvider(this)[LoginViewModel::class.java]
+        mEditUserViewModel = ViewModelProvider(this).get(EditUserViewModel::class.java)
 
         val usernameEditText = lbinding.tietUsername
         val passwordEditText = lbinding.tietPassword
@@ -87,12 +91,12 @@ class LoginActivity : AppCompatActivity() {
     }
 
 
-    private suspend fun validateLogin(username: String, password: String): Boolean {
+    private fun validateLogin(username: String, password: String): Boolean {
         val user = getUserByUsername(username)
         return user != null && user.password == password
     }
 
-    private suspend fun getUserByUsername(username: String): UserEntity? {
+    private fun getUserByUsername(username: String): UserEntity? {
         return try {
             mLoginViewModel.getUserByName(username)
         } catch (e: Exception) {
@@ -124,7 +128,7 @@ class LoginActivity : AppCompatActivity() {
         preferences.edit().putString(usersJsonKey, usersJson).apply()
     }
 
-    private suspend fun saveLastUserId(username: String) {
+    private fun saveLastUserId(username: String) {
         val user = getUserByUsername(username)
         val lastUserId = user?.id ?: 0
         preferences.edit().putLong(lastUserIdKey, lastUserId).apply()
@@ -147,7 +151,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun getUserById(id: Long): UserEntity? {
+    private fun getUserById(id: Long): UserEntity? {
         return try {
             mLoginViewModel.getUserById(id)
         } catch (e: Exception) {
@@ -162,5 +166,14 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showSnackbar(message: String) {
         Snackbar.make(lbinding.root, message, Snackbar.LENGTH_LONG).show()
+        hideKeyboard()
     }
+
+    @SuppressLint("ServiceCast")
+    fun hideKeyboard() {
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val view = currentFocus ?: View(this)
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
 }

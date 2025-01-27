@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -131,7 +132,7 @@ class EditNoteFragment : Fragment() {
                         Toast.LENGTH_SHORT
                     ).show()
 
-                    mActivity?.onBackPressedDispatcher?.onBackPressed()
+
                 }
                 is NoteEntity -> {
                     mEditNoteViewModel.setNoteSelected(mNoteEntity!!)
@@ -143,7 +144,17 @@ class EditNoteFragment : Fragment() {
                     ).show()
                 }
             }
+
+            if (!childFragmentManager.isStateSaved) {
+                mActivity?.onBackPressedDispatcher?.onBackPressed()
+            } else {
+                // Si ya hay una transacción pendiente, puedes hacer algo aquí, como un Log o un Toast
+                Log.d("FragmentManager", "Transacción de fragmentos pendiente.")
+            }
+
         }
+
+
     }
 
     private fun setUINote(noteEntity: NoteEntity) {

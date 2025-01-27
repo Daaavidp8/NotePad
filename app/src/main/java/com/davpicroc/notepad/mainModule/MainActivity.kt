@@ -65,8 +65,6 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
         }
     }
 
-    // Pregunta a Antonio: se puede pasar al constructor del viewmodel el id de usuario para extraer
-    // las notas de un usuario en especifico?
 
     private fun setupViewModel() {
         mMainViewModel = ViewModelProvider(this,MainViewModelFactory(userId))[MainViewModel::class.java]
@@ -79,11 +77,15 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
             if (isVisible) mbinding.fabAddNote.show() else mbinding.fabAddNote.hide()
         }
 
-        mEditNoteViewModel.getNoteSelected().observe(this){ noteEntity ->
+        mEditNoteViewModel.getNoteSelected().observe(this) { noteEntity ->
             if (noteEntity.id != 0L) {
-                noteAdapter.add(noteEntity)
+                val notes = noteAdapter.getNotes()
+                if (!notes.contains(noteEntity)) {
+                    noteAdapter.add(noteEntity)
+                }
             }
         }
+
     }
 
     // Preguntar a Antonio: Esto no se ni lo que hace, me lo ha hecho chatgpt
@@ -110,7 +112,7 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
             val fragmentTransaction = fragmentManager.beginTransaction()
             fragmentTransaction.add(R.id.containerMain, fragment)
             fragmentTransaction.addToBackStack(null)
-            fragmentTransaction.commitAllowingStateLoss()
+            fragmentTransaction.commit()
         }
         hideFab()
     }
