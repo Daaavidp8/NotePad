@@ -132,7 +132,6 @@ class EditNoteFragment : Fragment() {
                         Toast.LENGTH_SHORT
                     ).show()
 
-
                 }
                 is NoteEntity -> {
                     mEditNoteViewModel.setNoteSelected(mNoteEntity!!)
@@ -143,13 +142,6 @@ class EditNoteFragment : Fragment() {
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-            }
-
-            if (!childFragmentManager.isStateSaved) {
-                mActivity?.onBackPressedDispatcher?.onBackPressed()
-            } else {
-                // Si ya hay una transacción pendiente, puedes hacer algo aquí, como un Log o un Toast
-                Log.d("FragmentManager", "Transacción de fragmentos pendiente.")
             }
 
         }

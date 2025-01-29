@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
     private val lastUserIdKey by lazy { getString(R.string.sp_last_user) }
     private var userId by Delegates.notNull<Long>()
 
-    private var isFragmentTransactionInProgress = false
+    var isFragmentTransactionInProgress = false
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun launchEditFragment(noteEntity: NoteEntity = NoteEntity()) {
+    /*private fun launchEditFragment(noteEntity: NoteEntity = NoteEntity()) {
         mEditNoteViewModel.setShowFab(false)
         mEditNoteViewModel.setNoteSelected(noteEntity)
 
@@ -115,8 +115,31 @@ class MainActivity : AppCompatActivity(),OnClickListener, MainAux {
             fragmentTransaction.commit()
         }
         hideFab()
-    }
+    }*/
+    private fun launchEditFragment(noteEntity: NoteEntity = NoteEntity()) {
+        if (isFragmentTransactionInProgress) return // Si hay una transacción en progreso, no hacer nada.
 
+        isFragmentTransactionInProgress = true // Marcar que la transacción está en progreso
+        mEditNoteViewModel.setShowFab(false)
+        mEditNoteViewModel.setNoteSelected(noteEntity)
+
+        val fragment = EditNoteFragment()
+        val fragmentManager = supportFragmentManager
+
+        // Verificar si el FragmentManager está listo para una nueva transacción
+        if (!fragmentManager.isStateSaved) {
+            val fragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.add(R.id.containerMain, fragment)
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commitAllowingStateLoss() // Commit allowing state loss if necessary
+        }
+
+        hideFab()
+
+        // Asegurarnos de restablecer la bandera después de que la transacción se haya completado
+        fragmentManager.executePendingTransactions() // Asegura que todas las transacciones pendientes se completen
+        isFragmentTransactionInProgress = false
+    }
 
     private fun loadUserId() {
        userId = preferences.getLong(lastUserIdKey, 0)
